@@ -471,26 +471,39 @@ document.getElementById('surveyForm').addEventListener('submit', function(e) {
   }
 
   const data = collectData();
-  saveResponse(data);
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
 
-  const total = JSON.parse(localStorage.getItem('chewyVitesResponses') || '[]');
-  const header = '回答日時,Q1味評価（5段階）,Q2気になる製品,Q3購入意向,Q4自由記述,性別,年代,サプリ利用';
-  const csvContent = '\uFEFF' + header + '\n' + total.map(r =>
-    [r.timestamp, r.tasteRating, r.product, r.intent, r.comment, r.gender, r.age, r.supplement]
-    .map(v => `"${(v||'').replace(/"/g,'""')}"`).join(',')
-  ).join('\n');
-
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `ChewyVites_アンケート結果_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-
-  document.getElementById('surveyForm').style.display = 'none';
-  document.getElementById('thankyou').style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  fetch('https://formspree.io/f/xyklozbe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      'Q1_味評価（5段階）': data.tasteRating,
+      'Q2_気になる製品': data.product,
+      'Q3_購入意向': data.intent,
+      'Q4_自由記述': data.comment,
+      '性別': data.gender,
+      '年代': data.age,
+      'サプリ利用': data.supplement,
+    })
+  })
+  .then(res => {
+    if (res.ok) {
+      document.getElementById('surveyForm').style.display = 'none';
+      document.getElementById('thankyou').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      btn.disabled = false;
+      btn.textContent = '回答を送信する';
+      alert('送信に失敗しました。もう一度お試しください。');
+    }
+  })
+  .catch(() => {
+    btn.disabled = false;
+    btn.textContent = '回答を送信する';
+    alert('ネットワークエラーが発生しました。接続を確認してください。');
+  });
 });
 </script>
 </body>
