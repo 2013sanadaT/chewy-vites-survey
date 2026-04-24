@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chewy Vites グミサプリ アンケート</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #fff9f0 0%, #fff0f5 100%);
+    min-height: 100vh;
+    padding: 30px 16px;
+    color: #333;
+  }
+  .container { max-width: 760px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    background: linear-gradient(135deg, #ff6b9d, #ff9a3c);
+    border-radius: 20px;
+    padding: 36px 24px 28px;
+    margin-bottom: 28px;
+    color: white;
+    box-shadow: 0 8px 32px rgba(255,107,157,0.3);
+  }
+  .header .brand { font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.9; margin-bottom: 8px; }
+  .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; }
+  .header p { font-size: 14px; opacity: 0.9; line-height: 1.6; }
+  .progress-bar { background: rgba(255,255,255,0.3); border-radius: 10px; height: 6px; margin-top: 18px; overflow: hidden; }
+  .progress-fill { height: 100%; background: white; border-radius: 10px; width: 0%; transition: width 0.4s ease; }
+
+  /* Card */
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    border: 1px solid #f0e8ff;
+  }
+  .question-num {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6b9d, #ff9a3c);
+    color: white; font-size: 12px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 10px;
+  }
+  .question-title { font-size: 18px; font-weight: 700; color: #222; margin-bottom: 6px; line-height: 1.4; }
+  .question-sub { font-size: 13px; color: #888; margin-bottom: 18px; line-height: 1.5; }
+
+  /* Q1: Taste rating — large star-style 5 buttons */
+  .taste-rating {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 8px 0 16px;
+  }
+  .taste-rating input { display: none; }
+  .taste-rating label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.15s;
+  }
+  .taste-rating label:hover { transform: scale(1.08); }
+  .taste-num {
+    width: 56px; height: 56px;
+    border: 2.5px solid #eee;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800; color: #ccc;
+    transition: all 0.2s;
+    background: white;
+  }
+  .taste-rating input:checked + label .taste-num {
+    background: linear-gradient(135deg, #ff6b9d, #ff9a3c);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 14px rgba(255,107,157,0.4);
+    transform: scale(1.12);
+  }
+  .taste-rating input:checked + label .taste-text { color: #ff6b9d; font-weight: 700; }
+  .taste-text { font-size: 11px; color: #aaa; text-align: center; white-space: nowrap; }
+  .taste-scale-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: #bbb;
+    margin-top: 4px;
+    padding: 0 4px;
+  }
+
+  /* Tag-style pills (attributes) */
+  .pill-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill-option input { display: none; }
+  .pill-option label {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px;
+    border: 2px solid #eee; border-radius: 50px;
+    cursor: pointer; font-size: 14px; font-weight: 600; color: #555;
+    transition: all 0.2s; user-select: none;
+  }
+  .pill-option input:checked + label { border-color: #ff6b9d; background: #fff0f5; color: #ff6b9d; }
+  .pill-option label:hover { border-color: #ff9a3c; background: #fff9f0; }
+
+  /* Q2: Product grid */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 500px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
+  .product-option input { display: none; }
+  .product-card {
+    border: 2px solid #eee; border-radius: 14px;
+    padding: 14px 10px; cursor: pointer; text-align: center;
+    transition: all 0.2s; background: #fafafa; user-select: none;
+    display: block;
+  }
+  .product-option input:checked + .product-card {
+    border-color: #ff6b9d; background: #fff0f5;
+    box-shadow: 0 4px 16px rgba(255,107,157,0.2);
+    transform: translateY(-2px);
+  }
+  .product-card:hover { border-color: #ff9a3c; background: #fff9f0; }
+  .product-img {
+    width: 100px; height: 100px;
+    object-fit: contain;
+    margin: 0 auto 10px; display: block;
+    border-radius: 8px;
+  }
+  .product-name { font-size: 12px; font-weight: 700; color: #333; line-height: 1.3; margin-bottom: 6px; }
+  .product-point {
+    font-size: 10px; color: #888; line-height: 1.5;
+    background: #f8f8f8; border-radius: 6px;
+    padding: 5px 6px; text-align: left;
+  }
+  .product-point strong { color: #ff6b9d; font-size: 10px; }
+  .product-check { display: none; margin-top: 8px; color: #ff6b9d; font-size: 13px; font-weight: 700; }
+  .product-option input:checked + .product-card .product-check { display: block; }
+
+  /* Q3: Purchase intent */
+  .intent-options { display: flex; flex-direction: column; gap: 10px; }
+  .intent-option input { display: none; }
+  .intent-option label {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; border: 2px solid #eee; border-radius: 12px;
+    cursor: pointer; font-size: 14px; font-weight: 600; color: #444;
+    transition: all 0.2s; user-select: none;
+  }
+  .intent-option input:checked + label { border-color: #ff6b9d; background: #fff0f5; color: #cc3366; }
+  .intent-option label:hover { border-color: #ff9a3c; background: #fff9f0; }
+  .intent-dot {
+    width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ddd;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .intent-option input:checked + label .intent-dot { background: #ff6b9d; border-color: #ff6b9d; }
+  .intent-option input:checked + label .intent-dot::after {
+    content: ''; width: 8px; height: 8px; background: white; border-radius: 50%; display: block;
+  }
+  .intent-emoji { font-size: 20px; margin-left: auto; }
+
+  /* Q4: Free comment */
+  .comment-area {
+    width: 100%; min-height: 110px;
+    border: 2px solid #eee; border-radius: 12px;
+    padding: 14px; font-size: 14px; font-family: inherit;
+    color: #333; resize: vertical; transition: border-color 0.2s; outline: none;
+  }
+  .comment-area:focus { border-color: #ff6b9d; }
+
+  /* Submit */
+  .submit-section { text-align: center; margin-top: 8px; }
+  .submit-btn {
+    background: linear-gradient(135deg, #ff6b9d, #ff9a3c);
+    color: white; border: none; padding: 16px 60px;
+    font-size: 16px; font-weight: 700; border-radius: 50px; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(255,107,157,0.4); transition: all 0.2s; letter-spacing: 0.5px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(255,107,157,0.5); }
+  .required-note { font-size: 12px; color: #aaa; margin-top: 12px; }
+  .required-star { color: #ff4466; margin-left: 4px; }
+
+  /* Error */
+  .error-msg { display: none; color: #ff4466; font-size: 12px; margin-top: 8px; font-weight: 600; }
+  .has-error .error-msg { display: block; }
+  .has-error { border-color: #ffccdd !important; }
+
+  /* Thank you */
+  .thankyou {
+    display: none; text-align: center; background: white;
+    border-radius: 20px; padding: 60px 32px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  }
+  .thankyou .icon { font-size: 64px; margin-bottom: 20px; }
+  .thankyou h2 { font-size: 24px; font-weight: 800; color: #333; margin-bottom: 12px; }
+  .thankyou p { font-size: 15px; color: #888; line-height: 1.7; }
+
+  /* Price highlight */
+  .price-highlight {
+    display: inline-block;
+    background: linear-gradient(135deg, #fff0f5, #fff9f0);
+    border: 2px solid #ffccdd;
+    border-radius: 12px;
+    padding: 10px 18px;
+    margin: 8px 0 18px;
+    font-size: 15px;
+    color: #cc3366;
+    font-weight: 700;
+  }
+  .price-highlight span { font-size: 22px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">Chewy Vites</div>
+    <h1>グミサプリ アンケート</h1>
+    <p>日本への輸入販売検討のためのアンケートです。<br>ご協力よろしくお願いいたします（約3分）</p>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <form id="surveyForm">
+
+    <!-- Q1: Taste rating (5-level) -->
+    <div class="card" id="card-q1">
+      <span class="question-num">Q1</span>
+      <div class="question-title">今回食べたグミの味を評価してください<span class="required-star">*</span></div>
+      <div class="question-sub">1〜5の5段階でお答えください（1: 全くおいしくない ／ 5: とてもおいしい）</div>
+
+      <div class="taste-rating">
+        <div><input type="radio" id="tr1" name="tasteRating" value="1"><label for="tr1"><div class="taste-num">1</div><div class="taste-text">全く<br>おいしくない</div></label></div>
+        <div><input type="radio" id="tr2" name="tasteRating" value="2"><label for="tr2"><div class="taste-num">2</div><div class="taste-text">あまり<br>おいしくない</div></label></div>
+        <div><input type="radio" id="tr3" name="tasteRating" value="3"><label for="tr3"><div class="taste-num">3</div><div class="taste-text">普通</div></label></div>
+        <div><input type="radio" id="tr4" name="tasteRating" value="4"><label for="tr4"><div class="taste-num">4</div><div class="taste-text">おいしい</div></label></div>
+        <div><input type="radio" id="tr5" name="tasteRating" value="5"><label for="tr5"><div class="taste-num">5</div><div class="taste-text">とても<br>おいしい</div></label></div>
+      </div>
+      <div class="error-msg">評価を選択してください</div>
+    </div>
+
+    <!-- Q2: Product selection with real images -->
+    <div class="card" id="card-q2">
+      <span class="question-num">Q2</span>
+      <div class="question-title">この中に気になるグミはありますか？<span class="required-star">*</span></div>
+      <div class="question-sub">気になる製品をすべて選択してください（複数選択可）</div>
+
+      <div class="product-grid">
+
+        <div class="product-option">
+          <input type="checkbox" id="p1" name="product" value="マルチビタミン">
+          <label class="product-card" for="p1">
+            <img class="product-img" src="survey_images/image1.png" alt="マルチビタミン">
+            <div class="product-name">マルチビタミン</div>
+            <div class="product-point"><strong>POINT：</strong>12種の必須栄養素を凝縮した大人向け総合マルチビタミン</div>
+            <div class="product-check">✓ 選択中</div>
+          </label>
+        </div>
+
+        <div class="product-option">
+          <input type="checkbox" id="p2" name="product" value="免疫サポート">
+          <label class="product-card" for="p2">
+            <img class="product-img" src="survey_images/image2.png" alt="免疫サポート">
+            <div class="product-name">免疫サポート</div>
+            <div class="product-point"><strong>POINT：</strong>6種の栄養素で免疫サポート</div>
+            <div class="product-check">✓ 選択中</div>
+          </label>
+        </div>
+
+        <div class="product-option">
+          <input type="checkbox" id="p3" name="product" value="髪・肌・爪">
+          <label class="product-card" for="p3">
+            <img class="product-img" src="survey_images/image3.png" alt="髪・肌・爪">
+            <div class="product-name">髪・肌・爪</div>
+            <div class="product-point"><strong>POINT：</strong>ビオチン含む14種の栄養素で髪・肌・爪を総合ケア</div>
+            <div class="product-check">✓ 選択中</div>
+          </label>
+        </div>
+
+        <div class="product-option">
+          <input type="checkbox" id="p4" name="product" value="睡眠サポート">
+          <label class="product-card" for="p4">
+            <img class="product-img" src="survey_images/image4.png" alt="睡眠サポート">
+            <div class="product-name">睡眠サポート</div>
+            <div class="product-point"><strong>POINT：</strong>5-HTP＋マグネシウム＋B6で睡眠の質とリラックスをサポート</div>
+            <div class="product-check">✓ 選択中</div>
+          </label>
+        </div>
+
+        <div class="product-option">
+          <input type="checkbox" id="p5" name="product" value="ビタミンD">
+          <label class="product-card" for="p5">
+            <img class="product-img" src="survey_images/image5.png" alt="ビタミンD">
+            <div class="product-name">ビタミンD</div>
+            <div class="product-point"><strong>POINT：</strong>不足しがちなビタミンDを手軽に補給</div>
+            <div class="product-check">✓ 選択中</div>
+          </label>
+        </div>
+
+        <div class="product-option">
+          <input type="checkbox" id="p6" name="product" value="マグネシウム">
+          <label class="product-card" for="p6">
+            <img class="product-img" src="survey_images/image6.png" alt="マグネシウム">
+            <div class="product-name">マグネシウム</div>
+            <div class="product-point"><strong>POINT：</strong>吸収率の高いクエン酸マグネシウムで毎日のコンディションを整える</div>
+            <div class="product-check">✓ 選択中</div>
+          </label>
+        </div>
+
+      </div>
+
+      <div style="margin-top:14px;">
+        <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:#888;cursor:pointer;">
+          <input type="checkbox" id="p_none" name="product" value="気になる製品なし" style="width:16px;height:16px;accent-color:#ff6b9d;">
+          気になる製品はない
+        </label>
+      </div>
+      <div class="error-msg">少なくとも1つ選択してください</div>
+    </div>
+
+    <!-- Q3: Purchase intent -->
+    <div class="card" id="card-q3">
+      <span class="question-num">Q3</span>
+      <div class="question-title">これらのグミサプリを購入する可能性はありますか？<span class="required-star">*</span></div>
+      <div class="price-highlight">60粒（約2か月分）あたり <span>2,500円</span> で販売された場合</div>
+      <div class="intent-options">
+        <div class="intent-option">
+          <input type="radio" id="i1" name="intent" value="ぜひ購入したい">
+          <label for="i1"><div class="intent-dot"></div>ぜひ購入したい<span class="intent-emoji">🛒</span></label>
+        </div>
+        <div class="intent-option">
+          <input type="radio" id="i2" name="intent" value="おそらく購入する">
+          <label for="i2"><div class="intent-dot"></div>おそらく購入すると思う<span class="intent-emoji">👍</span></label>
+        </div>
+        <div class="intent-option">
+          <input type="radio" id="i3" name="intent" value="わからない">
+          <label for="i3"><div class="intent-dot"></div>まだわからない<span class="intent-emoji">🤔</span></label>
+        </div>
+        <div class="intent-option">
+          <input type="radio" id="i4" name="intent" value="おそらく購入しない">
+          <label for="i4"><div class="intent-dot"></div>あまり購入しないと思う<span class="intent-emoji">😐</span></label>
+        </div>
+        <div class="intent-option">
+          <input type="radio" id="i5" name="intent" value="購入しない">
+          <label for="i5"><div class="intent-dot"></div>購入しない<span class="intent-emoji">❌</span></label>
+        </div>
+      </div>
+      <div class="error-msg">選択してください</div>
+    </div>
+
+    <!-- Q4: Free comment -->
+    <div class="card" id="card-q4">
+      <span class="question-num">Q4</span>
+      <div class="question-title">自由記述</div>
+      <div class="question-sub">ご意見・ご感想があればお聞かせください（任意）<br>例：価格について、他に気になる効果・栄養素、味の感想など</div>
+      <textarea class="comment-area" id="comment" name="comment" placeholder="ご自由にお書きください"></textarea>
+    </div>
+
+    <!-- Attributes -->
+    <div class="card">
+      <span class="question-num">最後に</span>
+      <div class="question-title">あなた自身についてお聞かせください</div>
+      <div class="question-sub">任意回答</div>
+
+      <div style="margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px;color:#444;">性別</div>
+        <div class="pill-grid">
+          <div class="pill-option"><input type="radio" id="g1" name="gender" value="男性"><label for="g1">男性</label></div>
+          <div class="pill-option"><input type="radio" id="g2" name="gender" value="女性"><label for="g2">女性</label></div>
+          <div class="pill-option"><input type="radio" id="g3" name="gender" value="回答しない"><label for="g3">回答しない</label></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px;color:#444;">年代</div>
+        <div class="pill-grid">
+          <div class="pill-option"><input type="radio" id="age1" name="age" value="10代以下"><label for="age1">10代以下</label></div>
+          <div class="pill-option"><input type="radio" id="age2" name="age" value="20代"><label for="age2">20代</label></div>
+          <div class="pill-option"><input type="radio" id="age3" name="age" value="30代"><label for="age3">30代</label></div>
+          <div class="pill-option"><input type="radio" id="age4" name="age" value="40代"><label for="age4">40代</label></div>
+          <div class="pill-option"><input type="radio" id="age5" name="age" value="50代以上"><label for="age5">50代以上</label></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px;color:#444;">現在サプリメントを利用していますか？</div>
+        <div class="pill-grid">
+          <div class="pill-option"><input type="radio" id="su1" name="supplement" value="定期的に利用"><label for="su1">定期的に利用</label></div>
+          <div class="pill-option"><input type="radio" id="su2" name="supplement" value="たまに利用"><label for="su2">たまに利用</label></div>
+          <div class="pill-option"><input type="radio" id="su3" name="supplement" value="利用していない"><label for="su3">利用していない</label></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-section">
+      <button type="submit" class="submit-btn" id="submitBtn">回答を送信する</button>
+      <div class="required-note"><span style="color:#ff4466;">*</span> は必須項目です</div>
+    </div>
+
+  </form>
+
+  <!-- Thank you -->
+  <div class="thankyou" id="thankyou">
+    <div class="icon">🎉</div>
+    <h2>ご回答ありがとうございました！</h2>
+    <p>いただいたご意見は、Chewy Vites の<br>日本販売検討に活用させていただきます。<br><br>引き続きよろしくお願いいたします。</p>
+  </div>
+</div>
+
+<script>
+// Progress
+function updateProgress() {
+  let done = 0;
+  if (document.querySelector('input[name="tasteRating"]:checked')) done++;
+  if (document.querySelectorAll('input[name="product"]:checked').length > 0) done++;
+  if (document.querySelector('input[name="intent"]:checked')) done++;
+  document.getElementById('progressFill').style.width = Math.round((done / 3) * 100) + '%';
+}
+document.querySelectorAll('input').forEach(el => el.addEventListener('change', updateProgress));
+
+// Validation
+function validate() {
+  let valid = true;
+
+  const q1ok = !!document.querySelector('input[name="tasteRating"]:checked');
+  document.getElementById('card-q1').classList.toggle('has-error', !q1ok);
+  if (!q1ok) valid = false;
+
+  const q2ok = document.querySelectorAll('input[name="product"]:checked').length > 0;
+  document.getElementById('card-q2').classList.toggle('has-error', !q2ok);
+  if (!q2ok) valid = false;
+
+  const q3ok = !!document.querySelector('input[name="intent"]:checked');
+  document.getElementById('card-q3').classList.toggle('has-error', !q3ok);
+  if (!q3ok) valid = false;
+
+  return valid;
+}
+
+// Collect
+function collectData() {
+  const products = [...document.querySelectorAll('input[name="product"]:checked')].map(el => el.value);
+  return {
+    timestamp: new Date().toLocaleString('ja-JP'),
+    tasteRating: document.querySelector('input[name="tasteRating"]:checked')?.value || '',
+    product: products.join('、'),
+    intent: document.querySelector('input[name="intent"]:checked')?.value || '',
+    comment: document.getElementById('comment').value,
+    gender: document.querySelector('input[name="gender"]:checked')?.value || '',
+    age: document.querySelector('input[name="age"]:checked')?.value || '',
+    supplement: document.querySelector('input[name="supplement"]:checked')?.value || '',
+  };
+}
+
+function saveResponse(data) {
+  const existing = JSON.parse(localStorage.getItem('chewyVitesResponses') || '[]');
+  existing.push(data);
+  localStorage.setItem('chewyVitesResponses', JSON.stringify(existing));
+}
+
+document.getElementById('surveyForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  if (!validate()) {
+    const firstError = document.querySelector('.has-error');
+    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const data = collectData();
+  saveResponse(data);
+
+  const total = JSON.parse(localStorage.getItem('chewyVitesResponses') || '[]');
+  const header = '回答日時,Q1味評価（5段階）,Q2気になる製品,Q3購入意向,Q4自由記述,性別,年代,サプリ利用';
+  const csvContent = '\uFEFF' + header + '\n' + total.map(r =>
+    [r.timestamp, r.tasteRating, r.product, r.intent, r.comment, r.gender, r.age, r.supplement]
+    .map(v => `"${(v||'').replace(/"/g,'""')}"`).join(',')
+  ).join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ChewyVites_アンケート結果_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  document.getElementById('surveyForm').style.display = 'none';
+  document.getElementById('thankyou').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+</body>
+</html>
