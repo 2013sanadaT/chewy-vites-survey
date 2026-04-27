@@ -389,10 +389,18 @@
       <div>
         <div style="font-size:14px;font-weight:600;margin-bottom:10px;color:#444;">現在サプリメントを利用していますか？</div>
         <div class="pill-grid">
-          <div class="pill-option"><input type="radio" id="su1" name="supplement" value="定期的に利用"><label for="su1">定期的に利用</label></div>
-          <div class="pill-option"><input type="radio" id="su2" name="supplement" value="たまに利用"><label for="su2">たまに利用</label></div>
-          <div class="pill-option"><input type="radio" id="su3" name="supplement" value="利用していない"><label for="su3">利用していない</label></div>
+          <div class="pill-option"><input type="radio" id="su1" name="supplement" value="定期的に利用" onchange="toggleSupplementDetail()"><label for="su1">定期的に利用</label></div>
+          <div class="pill-option"><input type="radio" id="su2" name="supplement" value="たまに利用" onchange="toggleSupplementDetail()"><label for="su2">たまに利用</label></div>
+          <div class="pill-option"><input type="radio" id="su3" name="supplement" value="利用していない" onchange="toggleSupplementDetail()"><label for="su3">利用していない</label></div>
         </div>
+      </div>
+
+      <div id="supplement-detail" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0;animation:fadeIn 0.3s ease;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px;color:#444;">どのようなサプリメントを利用していますか？</div>
+        <div style="font-size:12px;color:#aaa;margin-bottom:10px;">任意回答</div>
+        <textarea class="comment-area" id="supplementDetail" name="supplementDetail"
+          placeholder="例：ビタミンC、プロテイン、マルチビタミン、グミかサプリメントか など"
+          style="min-height:80px;"></textarea>
       </div>
     </div>
 
@@ -441,6 +449,12 @@ function validate() {
   return valid;
 }
 
+function toggleSupplementDetail() {
+  const val = document.querySelector('input[name="supplement"]:checked')?.value || '';
+  const show = val === '定期的に利用' || val === 'たまに利用';
+  document.getElementById('supplement-detail').style.display = show ? 'block' : 'none';
+}
+
 // Collect
 function collectData() {
   const products = [...document.querySelectorAll('input[name="product"]:checked')].map(el => el.value);
@@ -453,6 +467,7 @@ function collectData() {
     gender: document.querySelector('input[name="gender"]:checked')?.value || '',
     age: document.querySelector('input[name="age"]:checked')?.value || '',
     supplement: document.querySelector('input[name="supplement"]:checked')?.value || '',
+    supplementDetail: document.getElementById('supplementDetail').value,
   };
 }
 
@@ -486,6 +501,7 @@ document.getElementById('surveyForm').addEventListener('submit', function(e) {
       '性別': data.gender,
       '年代': data.age,
       'サプリ利用': data.supplement,
+      '利用中のサプリメント': data.supplementDetail,
     })
   })
   .then(res => {
