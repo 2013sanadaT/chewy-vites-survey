@@ -386,6 +386,25 @@
         </div>
       </div>
 
+      <div style="margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px;color:#444;">お子さんはいらっしゃいますか？</div>
+        <div class="pill-grid">
+          <div class="pill-option"><input type="radio" id="ch1" name="hasChild" value="はい" onchange="toggleChildDetail()"><label for="ch1">はい</label></div>
+          <div class="pill-option"><input type="radio" id="ch2" name="hasChild" value="いいえ" onchange="toggleChildDetail()"><label for="ch2">いいえ</label></div>
+          <div class="pill-option"><input type="radio" id="ch3" name="hasChild" value="回答しない" onchange="toggleChildDetail()"><label for="ch3">回答しない</label></div>
+        </div>
+      </div>
+
+      <div id="child-detail" style="display:none;margin-bottom:20px;padding:16px;background:#fff8fb;border:1px solid #ffccdd;border-radius:12px;animation:fadeIn 0.3s ease;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px;color:#444;">子供向けに栄養素が調整された製品もあります。子供に食べさせようと思いますか？</div>
+        <div style="font-size:12px;color:#aaa;margin-bottom:10px;">任意回答</div>
+        <div class="pill-grid">
+          <div class="pill-option"><input type="radio" id="cf1" name="childFeed" value="食べさせようと思う"><label for="cf1">食べさせようと思う</label></div>
+          <div class="pill-option"><input type="radio" id="cf2" name="childFeed" value="食べさせようとは思わない"><label for="cf2">食べさせようとは思わない</label></div>
+          <div class="pill-option"><input type="radio" id="cf3" name="childFeed" value="わからない"><label for="cf3">わからない</label></div>
+        </div>
+      </div>
+
       <div>
         <div style="font-size:14px;font-weight:600;margin-bottom:10px;color:#444;">現在サプリメントを利用していますか？</div>
         <div class="pill-grid">
@@ -449,6 +468,11 @@ function validate() {
   return valid;
 }
 
+function toggleChildDetail() {
+  const val = document.querySelector('input[name="hasChild"]:checked')?.value || '';
+  document.getElementById('child-detail').style.display = val === 'はい' ? 'block' : 'none';
+}
+
 function toggleSupplementDetail() {
   const val = document.querySelector('input[name="supplement"]:checked')?.value || '';
   const show = val === '定期的に利用' || val === 'たまに利用';
@@ -466,6 +490,8 @@ function collectData() {
     comment: document.getElementById('comment').value,
     gender: document.querySelector('input[name="gender"]:checked')?.value || '',
     age: document.querySelector('input[name="age"]:checked')?.value || '',
+    hasChild: document.querySelector('input[name="hasChild"]:checked')?.value || '',
+    childFeed: document.querySelector('input[name="childFeed"]:checked')?.value || '',
     supplement: document.querySelector('input[name="supplement"]:checked')?.value || '',
     supplementDetail: document.getElementById('supplementDetail').value,
   };
@@ -500,6 +526,8 @@ document.getElementById('surveyForm').addEventListener('submit', function(e) {
       'Q4_自由記述': data.comment,
       '性別': data.gender,
       '年代': data.age,
+      'お子さんの有無': data.hasChild,
+      '子供への提供意向': data.childFeed,
       'サプリ利用': data.supplement,
       '利用中のサプリメント': data.supplementDetail,
     })
